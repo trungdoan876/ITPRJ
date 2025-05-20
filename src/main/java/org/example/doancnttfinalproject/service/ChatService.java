@@ -12,10 +12,15 @@ public class ChatService {
     private final String flaskApiUrl = "https://web-production-27cf.up.railway.app/chat";
     private RestTemplate restTemplate = new RestTemplate();
 
-    public String sendMessageToFlask(String userMessage) {
+    public String sendMessageToFlask(String userMessage, String email, String name) {
         // Tạo body JSON
+        System.out.println("sendMessageToFlask");
+        System.out.println(name);
+        System.out.println(email);
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("message", userMessage);
+        requestBody.put("name", name);
+        requestBody.put("email", email);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

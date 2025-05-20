@@ -551,11 +551,13 @@
             const response = await fetch('http://localhost:8080/send-chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: "include",
                 body: JSON.stringify({ message: prompt })
             });
             // Kiểm tra trạng thái HTTP
             if (!response.ok) {
-                throw new Error(`Lỗi HTTP: ${response.status} - ${response.statusText}`);
+                const errorText = await response.text();
+                throw new Error(`Lỗi HTTP: ${response.status} - ${response.statusText} - ${errorText}`);
             }
             // Xử lý phản hồi text
             const botResponse = await response.text();
