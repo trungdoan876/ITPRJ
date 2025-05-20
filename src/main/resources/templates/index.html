@@ -22,8 +22,6 @@
             background-color: #f8f9fa;
             color: #212529;
         }
-
-        /* Sidebar wrapper */
         .sidebar-wrapper {
             position: fixed;
             top: 0;
@@ -34,8 +32,6 @@
             margin-left: 0;
             z-index: 5;
         }
-
-        /* Sidebar */
         .sidebar {
             width: 250px;
             background-color: #202123;
@@ -55,11 +51,9 @@
             padding: 0;
             margin: 0;
         }
-
-        /* Buttons bên cạnh sidebar */
         .sidebar-toggle-button, .new-conversation-button {
-            position: fixed; /* Giữ cố định */
-            top: 10px; /* Đặt sát top */
+            position: fixed;
+            top: 10px;
             background: none;
             border: none;
             color: #d1d5db;
@@ -68,13 +62,13 @@
             display: flex;
             align-items: center;
             margin-left: 25px;
-            transition: left 0.3s ease; /* Hiệu ứng di chuyển mượt mà */
+            transition: left 0.3s ease;
         }
         .sidebar-toggle-button {
-            left: 250px; /* Mặc định nằm ngay bên phải sidebar */
+            left: 250px;
         }
         .new-conversation-button {
-            left: 290px; /* Nằm bên phải sidebar-toggle-button */
+            left: 290px;
         }
         .sidebar-toggle-button:hover, .new-conversation-button:hover {
             color: #ffffff;
@@ -83,8 +77,6 @@
             width: 24px;
             height: 24px;
         }
-
-        /* Conversation items */
         .conversation-item {
             padding: 10px 15px;
             margin: 5px 0;
@@ -131,10 +123,8 @@
             width: 16px;
             height: 16px;
         }
-
-        /* Main wrapper */
         .main-wrapper {
-            margin-left: 270px; /* Để lại khoảng cách cho sidebar (250px) + 20px khoảng cách */
+            margin-left: 270px;
             max-width: 1000px;
             width: calc(100% - 270px);
             flex: 1;
@@ -142,8 +132,6 @@
             flex-direction: column;
             position: relative;
         }
-
-        /* Chat container */
         .chat-container {
             flex: 1;
             display: flex;
@@ -156,8 +144,6 @@
         .chat-container.light-mode {
             background-color: #f8f9fa;
         }
-
-        /* Message box */
         .message-box {
             background-color: #2b2b2b;
             border-radius: 20px;
@@ -193,8 +179,6 @@
         .message-box.light-mode strong {
             color: #007bff;
         }
-
-        /* Input container */
         #input-container {
             background-color: #2b2b2b;
             padding: 16px;
@@ -261,8 +245,6 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
-        /* Theme switch */
         .theme-switch-wrapper {
             position: fixed;
             top: 10px;
@@ -312,14 +294,11 @@
     </style>
 </head>
 <body>
-<!-- Các nút được đặt bên ngoài sidebar-wrapper để không bị ẩn -->
-<!-- nut hien danh sach cuoc tro chuyen-->
 <button class="sidebar-toggle-button" onclick="toggleSidebar()" title="View Conversations">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
         <path fill="currentColor" d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2"/>
     </svg>
 </button>
-<!-- nut tao cuoc tro chuyen moi -->
 <button class="new-conversation-button" onclick="newConversation()" title="New Conversation">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
         <path fill="currentColor" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
@@ -334,14 +313,15 @@
 
 <div class="main-wrapper">
     <div class="chat-container" id="chat-container"></div>
-
     <div id="input-container">
         <div class="loading-indicator" id="loading-indicator"></div>
         <input type="text" id="prompt-input" placeholder="Enter your question..."/>
         <button id="send-button" onclick="sendRequest()">Gửi</button>
     </div>
 </div>
-
+<div>
+    <img src="logotruong.png" style="height: 75px; width: 60px">
+</div>
 <div class="theme-switch-wrapper">
     <label class="theme-switch">
         <input type="checkbox" id="checkbox" onchange="toggleTheme()">
@@ -410,13 +390,6 @@
         newConversationButton.style.left = sidebarVisible ? '290px' : '40px';
     }
 
-    function newConversation() {
-        conversationId = Date.now().toString();
-        chatContainer.innerHTML = '';
-        promptInput.value = '';
-        loadConversations();
-    }
-
     function formatDateTime(timestamp) {
         const date = new Date(parseInt(timestamp));
         return date.toLocaleString('en-US', {
@@ -433,95 +406,158 @@
         return prompt.length > 30 ? prompt.substring(0, 27) + '...' : prompt;
     }
 
-    function deleteConversation(id) {
-        let conversations = JSON.parse(localStorage.getItem('conversations') || '{}');
-        delete conversations[id];
-        localStorage.setItem('conversations', JSON.stringify(conversations));
-        loadConversations();
-        if (conversationId === id) {
-            newConversation();
-        }
-    }
-
-    function loadConversations() {
-        conversationList.innerHTML = '';
-        const conversations = JSON.parse(localStorage.getItem('conversations') || '{}');
-        for (const id in conversations) {
-            const firstPrompt = conversations[id].find(msg => msg.role === 'user')?.content || 'Untitled';
-            const li = document.createElement('li');
-            li.className = 'conversation-item';
-            if (body.classList.contains('light-mode')) li.classList.add('light-mode');
-
-            const infoDiv = document.createElement('div');
-            infoDiv.className = 'conversation-info';
-            infoDiv.innerHTML = `
-                <div class="conversation-time">${formatDateTime(id)}</div>
-                <div class="conversation-topic">${generateTopic(firstPrompt)}</div>
-            `;
-            infoDiv.onclick = () => loadConversation(id);
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-button';
-            deleteBtn.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                </svg>
-            `;
-            deleteBtn.onclick = (e) => {
-                e.stopPropagation();
-                deleteConversation(id);
-            };
-
-            li.appendChild(infoDiv);
-            li.appendChild(deleteBtn);
-            conversationList.appendChild(li);
-        }
-    }
-
-    async function saveConversation(prompt, response) {
+    async function deleteConversation(id) {
         try {
-            const payload = { conversationId, prompt, response };
-            const saveResponse = await fetch('/save-conversation', {
-                method: 'POST',
+            console.log('Bắt đầu xóa hội thoại với conversationId:', id); // Log để kiểm tra id
+            const response = await fetch(`/delete-conversation?conversationId=${id}`, {
+                method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                credentials: 'include'
             });
-            if (!saveResponse.ok) {
-                throw new Error(`Failed to save conversation: ${saveResponse.status} ${saveResponse.statusText}`);
+
+            const responseBody = await response.text(); // Lấy nội dung phản hồi
+            console.log('Phản hồi từ server:', response.status, responseBody); // Log phản hồi
+
+            if (!response.ok) {
+                throw new Error(`Xóa hội thoại thất bại: ${response.status} ${response.statusText} - ${responseBody}`);
             }
 
-            let conversations = JSON.parse(localStorage.getItem('conversations') || '{}');
-            if (!conversations[conversationId]) {
-                conversations[conversationId] = [];
-            }
-            conversations[conversationId].push({ role: 'user', content: prompt });
-            conversations[conversationId].push({ role: 'assistant', content: response });
-            localStorage.setItem('conversations', JSON.stringify(conversations));
-            console.log('Conversation saved to localStorage:', conversations);
-            loadConversations();
+            // Chờ một chút để server đồng bộ
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Reset trang web sau khi xóa
+            await newConversation();
         } catch (error) {
-            console.error("Error saving conversation:", error);
-            alert("Failed to save conversation: " + error.message);
+            console.error("Lỗi xóa hội thoại:", error);
+            alert(`Xóa hội thoại thất bại: ${error.message}`);
         }
     }
 
-    function loadConversation(id) {
-        conversationId = id;
-        chatContainer.innerHTML = '';
-        const conversations = JSON.parse(localStorage.getItem('conversations') || '{}');
-        const messages = conversations[id] || [];
-        messages.forEach(msg => {
-            const msgDiv = document.createElement('div'); // Sửa lỗi cú pháp
-            msgDiv.className = `message-box ${msg.role === 'user' ? 'user-message' : 'assistant-message'}`;
-            const sanitizedContent = msg.role === 'assistant' ?
-                marked.parse(msg.content.replace(/---/g, '')) :
-                msg.content;
-            msgDiv.innerHTML = sanitizedContent;
-            if (body.classList.contains('light-mode')) msgDiv.classList.add('light-mode');
-            chatContainer.appendChild(msgDiv);
-        });
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+    async function loadConversations() {
+        conversationList.innerHTML = '';
+        try {
+            const response = await fetch('/load-conversations', {
+                credentials: 'include'
+            });
+            if (!response.ok) {
+                throw new Error(`Không tải được hội thoại: ${response.status} ${response.statusText}`);
+            }
+            const conversations = await response.json();
+            console.log('Dữ liệu hội thoại:', conversations);
+
+            const grouped = {};
+            conversations.forEach(conv => {
+                if (!grouped[conv.conversationId]) {
+                    grouped[conv.conversationId] = [];
+                }
+                grouped[conv.conversationId].push(conv);
+            });
+
+            for (const id in grouped) {
+                const sortedMessages = grouped[id].sort((a, b) => a.timestamp - b.timestamp);
+                const firstMessage = sortedMessages[0];
+                const topic = firstMessage.prompt ?
+                    generateTopic(firstMessage.prompt) :
+                    generateTopic(firstMessage.response || 'Không có tiêu đề');
+                const timestamp = firstMessage.timestamp || id;
+
+                const li = document.createElement('li');
+                li.className = 'conversation-item';
+                if (body.classList.contains('light-mode')) li.classList.add('light-mode');
+
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'conversation-info';
+                infoDiv.innerHTML = `
+                    <div class="conversation-time">${formatDateTime(timestamp)}</div>
+                    <div class="conversation-topic">${topic}</div>
+                `;
+                infoDiv.onclick = () => loadConversation(id);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-button';
+                deleteBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                `;
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteConversation(id);
+                };
+
+                li.appendChild(infoDiv);
+                li.appendChild(deleteBtn);
+                conversationList.appendChild(li);
+            }
+        } catch (error) {
+            console.error("Lỗi tải hội thoại:", error);
+            alert("Không tải được hội thoại: " + error.message);
+        }
     }
+
+    async function loadConversation(id) {
+        if (!id || typeof id !== 'string') {
+            console.error("Invalid conversation ID:", id);
+            alert("ID hội thoại không hợp lệ.");
+            return;
+        }
+
+        conversationId = id; // Đặt conversationId để sử dụng cho tin nhắn mới
+        chatContainer.innerHTML = '';
+
+        try {
+            const response = await fetch('/load-conversations', {
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Không tải được hội thoại: ${response.status} ${response.statusText}`);
+            }
+
+            const conversations = await response.json();
+            console.log('Dữ liệu hội thoại cho id', id, ':', conversations);
+
+            const messages = conversations.filter(conv => conv.conversationId === id);
+            if (messages.length === 0) {
+                const noMsgDiv = document.createElement('div');
+                noMsgDiv.className = 'message-box assistant-message';
+                noMsgDiv.textContent = 'Không tìm thấy tin nhắn cho hội thoại này.';
+                if (body.classList.contains('light-mode')) noMsgDiv.classList.add('light-mode');
+                chatContainer.appendChild(noMsgDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                return;
+            }
+
+            const sortedMessages = messages.sort((a, b) => a.timestamp - b.timestamp);
+            sortedMessages.forEach(message => {
+                if (message.prompt) {
+                    const promptDiv = document.createElement('div');
+                    promptDiv.className = 'message-box user-message';
+                    promptDiv.textContent = message.prompt;
+                    if (body.classList.contains('light-mode')) promptDiv.classList.add('light-mode');
+                    chatContainer.appendChild(promptDiv);
+                }
+                if (message.response) {
+                    const responseDiv = document.createElement('div');
+                    responseDiv.className = 'message-box assistant-message';
+                    responseDiv.innerHTML = marked.parse(message.response.replace(/---/g, '') || 'Không có phản hồi');
+                    if (body.classList.contains('light-mode')) responseDiv.classList.add('light-mode');
+                    chatContainer.appendChild(responseDiv);
+                }
+            });
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        } catch (error) {
+            console.error("Lỗi tải hội thoại:", error);
+            const errMsg = document.createElement('div');
+            errMsg.className = 'message-box assistant-message';
+            errMsg.textContent = `Lỗi: Không tải được hội thoại - ${error.message}`;
+            if (body.classList.contains('light-mode')) errMsg.classList.add('light-mode');
+            chatContainer.appendChild(errMsg);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    }
+
 
     promptInput.addEventListener('keypress', (event) => {
         if (event.key === 'Enter') {
@@ -530,62 +566,73 @@
         }
     });
 
+    function newConversation() {
+        conversationId = Date.now().toString();
+        chatContainer.innerHTML = '';
+        promptInput.value = '';
+        loadConversations();
+
+        fetch("http://localhost:8080/reset", {
+            method: "POST"
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log("Đã reset:", data);
+            })
+            .catch(err => console.error("Lỗi reset:", err));
+    }
     async function sendRequest() {
         const prompt = promptInput.value.trim();
         if (!prompt) {
             console.warn("Vui lòng nhập câu hỏi?");
             return;
         }
-        // Hiển thị tin nhắn người dùng
         const userMsg = document.createElement("div");
         userMsg.className = "message-box user-message";
         userMsg.textContent = prompt;
         if (body.classList.contains('light-mode')) userMsg.classList.add('light-mode');
         chatContainer.appendChild(userMsg);
-        // Cập nhật giao diện
+
         promptInput.value = "";
         loadingIndicator.style.display = "inline-flex";
         sendButton.disabled = true;
+
         try {
-            // Gửi yêu cầu đến server
             const response = await fetch('http://localhost:8080/send-chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: "include",
-                body: JSON.stringify({ message: prompt })
+                credentials: 'include',
+                body: JSON.stringify({ message: prompt, conversationId })
             });
-            // Kiểm tra trạng thái HTTP
+
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Lỗi HTTP: ${response.status} - ${response.statusText} - ${errorText}`);
             }
-            // Xử lý phản hồi text
+
             const botResponse = await response.text();
             const displayResponse = botResponse || "Không nhận được phản hồi từ server.";
-            // Hiển thị phản hồi trợ lý
             const botMsg = document.createElement("div");
             botMsg.className = "message-box assistant-message";
             botMsg.innerHTML = marked.parse(displayResponse.replace(/---/g, ''));
             if (body.classList.contains('light-mode')) botMsg.classList.add('light-mode');
             chatContainer.appendChild(botMsg);
-            // Cuộn đến tin nhắn mới
+
             botMsg.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            // Lưu cuộc trò chuyện
-            await saveConversation(prompt, displayResponse);
+            loadConversations();
         } catch (error) {
             console.error('Lỗi khi gọi API:', error);
-            // Hiển thị thông báo lỗi
             const errMsg = document.createElement("div");
             errMsg.className = "message-box assistant-message";
             errMsg.textContent = `Lỗi: ${error.message || "Không thể kết nối đến server."}`;
             chatContainer.appendChild(errMsg);
             errMsg.scrollIntoView({ behavior: 'smooth', block: 'end' });
         } finally {
-            // Đặt lại trạng thái giao diện
             loadingIndicator.style.display = "none";
             sendButton.disabled = false;
         }
     }
+
     loadConversations();
 </script>
 </body>
